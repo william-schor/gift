@@ -1,5 +1,5 @@
 import click
-from gift.secrets.onepassword import OnePasswordSecretsManager
+from gift.secrets.op_secrets_manager import OnePasswordSecretsManager
 from gift.compress.compression_manager import CompressionManager
 
 @click.group()

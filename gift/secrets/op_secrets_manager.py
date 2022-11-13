@@ -42,5 +42,11 @@ class OnePasswordSecretsManager(SecretsManager):
             log_shell_output(stdout, stderr)
             raise InternalException
 
+    # def add_signature(self, indentifier: str, hash: str):
+    #     pass
+  
+    # def get_signature(self, indentifier: str) -> str:
+    #     pass
+
         
 

@@ -8,7 +8,7 @@ from gift.utils import InternalException
 
 
 class CompressionManager:
-    def wrap(self, filepath: str):
+    def wrap(self, filepath: str) -> None:
         file = Path(filepath)
         if file.is_dir():
             with ZipFile(f"{file.stem}{INTER_SUFFIX}", "w", ZIP_DEFLATED) as zip_file:
@@ -28,7 +28,7 @@ class CompressionManager:
             raise InternalException()
 
 
-    def unwrap(self, archive_path: str, dest_path: str):
+    def unwrap(self, archive_path: str, dest_path: str) -> None:
         dest = Path(dest_path)
         if dest.exists() and not dest.is_dir():
             print(f"{dest_path} is not a directory! Please give a directory to unwrap into.")

@@ -94,7 +94,7 @@ class EncryptionManager:
         )
 
         # reset HMAC (just in case)
-        self.hmac = HMAC(self.signing_key, hashes.SHA256())
+        self._reset_hmac()
 
     def unwrap(self, source: BufferedReader, sink: BufferedWriter):  
         # start by reading UNVERIFIED data       
@@ -239,6 +239,9 @@ class EncryptionManager:
             salt=salt,
             iterations=390000,
         )
-        key = base64.urlsafe_b64encode(kdf.derive(password.encode('utf-8')))
+        key = kdf.derive(password.encode('utf-8'))
         return key, salt
+    
+    def _reset_hmac(self):
+        self.hmac = HMAC(self.signing_key, hashes.SHA256())
         

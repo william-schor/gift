@@ -1,7 +1,5 @@
 from abc import ABC, abstractmethod
 
-VAULT = "FileWrap" # can be exposed as a setting later, but likely should not be dynamic
-
 class SecretsManager(ABC):
 
     @abstractmethod
