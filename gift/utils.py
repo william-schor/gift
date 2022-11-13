@@ -1,5 +1,6 @@
 import subprocess
-
+from typing import ContextManager
+from alive_progress import alive_bar # type: ignore
 
 class InternalException(Exception):
     pass
@@ -20,3 +21,7 @@ def log_shell_output(stdout, stderr):
         print(stderr)
         print("_"*30)
 
+
+
+def spinner(title: str | None = None) -> ContextManager:
+    return alive_bar(monitor=None, stats=None, title=title)

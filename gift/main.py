@@ -11,7 +11,7 @@ def cli():
 @click.option('--pwd-length', default=20, help='length of the password')
 def wrap(filename: str, pwd_length):
     cm = CompressionManager()
-    cm.compress(filename)
+    cm.wrap(filename)
     # opsm = OnePasswordSecretsManager()
     # print(opsm.create_secret(filename, pwd_length))
 
@@ -20,6 +20,6 @@ def wrap(filename: str, pwd_length):
 @click.option('--destination', '-d', default=".", type=click.Path())
 def unwrap(filename: str, destination: str):
     cm = CompressionManager()
-    cm.open(filename, destination)
+    cm.unwrap(filename, destination)
     # opsm = OnePasswordSecretsManager()
     # print(opsm.get_secret(filename))
