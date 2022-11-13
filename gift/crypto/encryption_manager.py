@@ -1,9 +1,9 @@
 
 import base64
-from io import SEEK_END, SEEK_SET, BufferedReader, BufferedWriter
 import os
-from pathlib import Path
 import struct
+from io import SEEK_END, SEEK_SET, BufferedReader, BufferedWriter
+from pathlib import Path
 
 from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives import hashes, padding
@@ -18,7 +18,7 @@ from gift.secrets.secrets_manager import SecretsManager
 File format:
 
 ----------------------------
-    key salt                |
+    salt  (16 bytes)        |
     password id             |
     data blocks             |
        .                    |
@@ -36,8 +36,13 @@ class EncryptionManager:
     def __init__(
         self, 
         secret_manager: SecretsManager,
+        block_size: int | None = None
     ) -> None:
         self.secret_manager = secret_manager
+        if block_size:
+            self.block_size = block_size
+        else:
+            self.block_size = BLOCK_SIZE
         
     def _init_key_material(self, password: str, salt_candidate: bytes | None = None):
         key, salt = self._derive_key_from_password(password, salt_candidate)
@@ -64,20 +69,20 @@ class EncryptionManager:
 
         # write password id to file (not secret)
         self._write_data_to_file(
-            password_id.encode('utf-8'), 
+            self._str_to_bytes(password_id),
             sink
         )   
 
         # now write the file, encrypted in chunks (secret)
         while True:
-            chunk = source.read(BLOCK_SIZE)
+            chunk = source.read(self.block_size)
             if len(chunk) == 0:
                 break
             
             enc = self._encrypt(chunk)
             self._write_data_to_file(enc, sink)
 
-            if len(chunk) < BLOCK_SIZE:
+            if len(chunk) < self.block_size:
                 break
         
         # now, all the data in the file is in the HMAC. 
@@ -88,9 +93,7 @@ class EncryptionManager:
         # Additionally save the HMAC to the SecretManager
         self.secret_manager.add_signature(
             password_id, 
-            base64.urlsafe_b64encode(
-                final_signature
-            ).decode('utf-8')
+            self._bytes_to_str(final_signature)
         )
 
         # reset HMAC (just in case)
@@ -99,11 +102,10 @@ class EncryptionManager:
     def unwrap(self, source: BufferedReader, sink: BufferedWriter):  
         # start by reading UNVERIFIED data       
         salt = self._read_next_data_block(source)
-        password_id_bytes = self._read_next_data_block(source)
-        password_id = password_id_bytes.decode('utf-8')
+        password_id = self._bytes_to_str(self._read_next_data_block(source))
 
         # make sure the stored hash matches the file's hash
-        stored_signature = self.secret_manager.read_signature(password_id).encode('utf-8')
+        stored_signature = self._str_to_bytes(self.secret_manager.read_signature(password_id))
         file_signature = self._get_hmac_from_file(source)
 
         if stored_signature != file_signature:
@@ -124,12 +126,10 @@ class EncryptionManager:
         end_of_data = Path(source.name).stat().st_size - 32
 
         ## read, decrypt, and write out the chunks
-        while True:
+        while source.tell() < end_of_data:
             encrypted_chunk = self._read_next_data_block(source)
             chunk = self._decrypt(encrypted_chunk)
             sink.write(chunk)
-            if source.tell() == end_of_data:
-                break
 
     def _encrypt(self, data: bytes):
         # generate iv
@@ -171,18 +171,20 @@ class EncryptionManager:
     def _verify_signature(self, source: BufferedReader, signature: bytes) -> None:
         # save current position in file to return to at the end
         incoming_fp_position = source.tell()
+        # start at the beginning of the file
+        source.seek(0, SEEK_SET)
         
         source_file_size = Path(source.name).stat().st_size
         bytes_left_to_be_read = source_file_size - 32
 
         while True:
-            if bytes_left_to_be_read > BLOCK_SIZE:
-                # there is at least BLOCK_SIZE left; read it
-                chunk = source.read(BLOCK_SIZE)
+            if bytes_left_to_be_read > self.block_size:
+                # there is at least self.block_size left; read it
+                chunk = source.read(self.block_size)
                 # update the hmac
                 self.hmac.update(chunk)
                 # record the read
-                bytes_left_to_be_read -= BLOCK_SIZE
+                bytes_left_to_be_read -= self.block_size
             else:
                 # only some bytes remain; read those
                 chunk = source.read(bytes_left_to_be_read)
@@ -244,4 +246,9 @@ class EncryptionManager:
     
     def _reset_hmac(self):
         self.hmac = HMAC(self.signing_key, hashes.SHA256())
+    
+    def _str_to_bytes(self, s: str) -> bytes:
+        return base64.b64decode(s)
         
+    def _bytes_to_str(self, b: bytes) -> str:
+        return base64.b64encode(b).decode()

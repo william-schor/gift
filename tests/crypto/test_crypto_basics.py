@@ -1,4 +1,3 @@
-import io
 import os
 import tempfile
 from io import BytesIO
@@ -14,6 +13,9 @@ from gift.secrets.secrets_manager import SecretsManager
 TEST_BLOCK_SIZE = 512
 
 class TestEncryptionManagerBasics:
+    """
+    These tests are for the helper functions and fundamentals of the EncryptionManager.
+    """
     @pytest.fixture
     def password(self) -> str:
         return "password1"
@@ -26,7 +28,7 @@ class TestEncryptionManagerBasics:
         return sm
     @pytest.fixture
     def encryption_manager(self, secrets_manager: SecretsManager) -> EncryptionManager:
-        em = EncryptionManager(secrets_manager)
+        em = EncryptionManager(secrets_manager, TEST_BLOCK_SIZE)
         return em
     @pytest.fixture
     def secrets_manager_with_secret(self, secret_identifier: str) -> DictSecretsManager:
@@ -35,7 +37,7 @@ class TestEncryptionManagerBasics:
         return sm
     @pytest.fixture
     def initialized_encryption_manager(self, secrets_manager_with_secret: SecretsManager, secret_identifier: str) -> EncryptionManager:
-        em = EncryptionManager(secrets_manager_with_secret)
+        em = EncryptionManager(secrets_manager_with_secret, TEST_BLOCK_SIZE)
         em._init_key_material(secrets_manager_with_secret.read_secret(secret_identifier))
         return em
     @pytest.fixture
@@ -50,12 +52,6 @@ class TestEncryptionManagerBasics:
     @pytest.fixture
     def ten_blocks(self) -> list[bytes]:
         return [os.urandom(TEST_BLOCK_SIZE) for _ in range(10)]
-    @pytest.fixture
-    def buffer(self, bytes_block: bytes) -> BytesIO:
-        b = BytesIO()
-        b.write(bytes_block)
-        b.seek(0)
-        return b
 
     def test_init_key_material(self, encryption_manager: EncryptionManager, password: str):
         key, salt = encryption_manager._derive_key_from_password(password)
@@ -99,7 +95,7 @@ class TestEncryptionManagerBasics:
 
     def test_read_and_write_data_to_file(self, bytes_block: bytes, initialized_encryption_manager: EncryptionManager):
         # test that _write_data_to_file and _read_next_data_block work together
-        in_memory_file = io.BytesIO()
+        in_memory_file = BytesIO()
         initialized_encryption_manager._write_data_to_file(bytes_block, in_memory_file) # type: ignore
 
         # reset pointer

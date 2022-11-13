@@ -6,7 +6,7 @@ class SecretsManager(ABC):
     def create_secret(self, indentifer: str, pwd_length: int) -> str:
         pass
     @abstractmethod
-    def read_secret(self, indentifer: str):
+    def read_secret(self, indentifer: str) -> str:
         pass
 
     @abstractmethod
