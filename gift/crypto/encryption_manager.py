@@ -103,7 +103,7 @@ class EncryptionManager:
         password_id = password_id_bytes.decode('utf-8')
 
         # make sure the stored hash matches the file's hash
-        stored_signature = self.secret_manager.get_signature(password_id).encode('utf-8')
+        stored_signature = self.secret_manager.read_signature(password_id).encode('utf-8')
         file_signature = self._get_hmac_from_file(source)
 
         if stored_signature != file_signature:

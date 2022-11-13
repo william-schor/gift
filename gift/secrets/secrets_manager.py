@@ -16,5 +16,5 @@ class SecretsManager(ABC):
         pass
   
     @abstractmethod
-    def get_signature(self, indentifier: str) -> str:
+    def read_signature(self, indentifier: str) -> str:
         pass
