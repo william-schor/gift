@@ -10,7 +10,7 @@ class SecretsManager(ABC):
         pass
 
     @abstractmethod
-    def add_signature(self, indentifier: str, hash: str):
+    def add_signature(self, indentifier: str, hash: str) -> str:
         pass
   
     @abstractmethod

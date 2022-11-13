@@ -23,8 +23,9 @@ class DictSecretsManager:
     def read_secret(self, indentifer: str):
         return self.secret_store[indentifer]["password"]
 
-    def add_signature(self, indentifier: str, signature: str):
+    def add_signature(self, indentifier: str, signature: str) -> str:
         self.secret_store[indentifier]["signature"] = signature
+        return indentifier
   
     def read_signature(self, indentifier: str) -> str:
         return self.secret_store[indentifier]["signature"]

@@ -46,7 +46,7 @@ class OnePasswordSecretsManager(SecretsManager):
             log_shell_output(stdout, stderr)
             raise OnePasswordException()
 
-    def add_signature(self, indentifier: str, signature: str):
+    def add_signature(self, indentifier: str, signature: str) -> str:
         stdout, stderr = shell_execute(
             self.OP_COMMAND,
             [   
@@ -71,8 +71,8 @@ class OnePasswordSecretsManager(SecretsManager):
                 "item",
                 "get",
                 indentifier,
-                "--fields"
-                "Integrity.HMAC",
+                "--fields",
+                "label=Integrity.HMAC",
             ]
         )
         if stdout: 
