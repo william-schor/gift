@@ -37,7 +37,7 @@ class TestEncryptionManagerHighLevel:
             source.seek(0)
             
             # now wrap the source
-            em.wrap(source, wrapped, source.name) # type: ignore
+            em.wrap(source, wrapped) # type: ignore
 
             # now lets examine the sink from the top
             wrapped.seek(0)
@@ -46,7 +46,7 @@ class TestEncryptionManagerHighLevel:
             password_id = em._read_next_data_block(wrapped) # type: ignore
             
             assert salt == em.salt
-            assert em._bytes_to_str(password_id) in sm.secret_store
+            assert password_id.decode() in sm.secret_store
 
             # back to top and unwrap
             wrapped.seek(0)

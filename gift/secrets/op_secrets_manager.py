@@ -5,13 +5,15 @@ import json
 class OnePasswordException(Exception):
     pass
 
+def success(code: int) -> bool:
+    return code == 0
 
 class OnePasswordSecretsManager(SecretsManager):
     VAULT = "FileWrap" # this can eventually be a setting
     OP_COMMAND = "op" # this can be a setting later
 
     def create_secret(self, indentifer: str, pwd_length: int) -> str:
-        stdout, stderr = shell_execute(
+        stdout, stderr, exit_code = shell_execute(
             self.OP_COMMAND,
             [
                 "item",
@@ -23,31 +25,49 @@ class OnePasswordSecretsManager(SecretsManager):
                 f"--format=json"
             ]
         )
-        try:
-            return json.loads(stdout)["id"]
-        except (json.JSONDecodeError, KeyError) as e:
-            print("Error! Output from 1Password:")
-            log_shell_output(stdout, stderr)
-            raise OnePasswordException(e)
+        if success(exit_code):
+            try:
+                return json.loads(stdout)["id"]
+            except (json.JSONDecodeError, KeyError) as e:
+                # continue to below error condition
+                pass
+
+        print("Error! Output from 1Password:")
+        log_shell_output(stdout, stderr)
+        raise OnePasswordException(e)
 
 
     def read_secret(self, indentifer: str) -> str:
-        stdout, stderr = shell_execute(
+        stdout, stderr, exit_code = shell_execute(
             self.OP_COMMAND,
             [   
                 "read",
                 f"op://{self.VAULT}/{indentifer}/password"
             ]
         )
-        if stdout: 
+        if stdout and success(exit_code): 
             return stdout
         else:
             print("Error! Output from 1Password:")
             log_shell_output(stdout, stderr)
             raise OnePasswordException()
 
+    def delete_secret(self, identifier: str) -> None:
+        stdout, stderr, exit_code = shell_execute(
+            self.OP_COMMAND,
+            [   
+                "item",
+                "delete",
+                identifier
+            ]
+        )
+        if not success(exit_code): 
+            print("Error! Output from 1Password:")
+            log_shell_output(stdout, stderr)
+            raise OnePasswordException()
+
     def add_signature(self, indentifier: str, signature: str) -> str:
-        stdout, stderr = shell_execute(
+        stdout, stderr, exit_code = shell_execute(
             self.OP_COMMAND,
             [   
                 "item",
@@ -57,15 +77,19 @@ class OnePasswordSecretsManager(SecretsManager):
                 "--format=json"
             ]
         )
-        try:
-            return json.loads(stdout)["id"]
-        except (json.JSONDecodeError, KeyError) as e:
-            print("Error! Output from 1Password:")
-            log_shell_output(stdout, stderr)
-            raise OnePasswordException(e)
+        if success(exit_code):
+            try:
+                return json.loads(stdout)["id"]
+            except (json.JSONDecodeError, KeyError) as e:
+                # continue to below error condition
+                pass
+
+        print("Error! Output from 1Password:")
+        log_shell_output(stdout, stderr)
+        raise OnePasswordException(e)
   
     def read_signature(self, indentifier: str) -> str:
-        stdout, stderr = shell_execute(
+        stdout, stderr, exit_code = shell_execute(
             self.OP_COMMAND,
             [   
                 "item",
@@ -75,7 +99,7 @@ class OnePasswordSecretsManager(SecretsManager):
                 "label=Integrity.HMAC",
             ]
         )
-        if stdout: 
+        if stdout and success(exit_code): 
             return stdout
         else:
             print("Error! Output from 1Password:")

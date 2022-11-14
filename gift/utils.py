@@ -1,15 +1,21 @@
+import shutil
 import subprocess
+import sys
+import tempfile
+from contextlib import contextmanager
 from typing import ContextManager
-from alive_progress import alive_bar # type: ignore
+
+from alive_progress import alive_bar  # type: ignore
+
 
 class InternalException(Exception):
     pass
 
-def shell_execute(command: str, arguments: list[str]) -> tuple[str, str]:
+def shell_execute(command: str, arguments: list[str]) -> tuple[str, str, int]:
     cmd = [command]
     cmd.extend(arguments)
     result = subprocess.run(cmd, capture_output=True, text=True)
-    return result.stdout, result.stderr
+    return result.stdout, result.stderr, result.returncode
 
 def log_shell_output(stdout, stderr):
     if stdout:
@@ -25,3 +31,16 @@ def log_shell_output(stdout, stderr):
 
 def spinner(title: str | None = None) -> ContextManager:
     return alive_bar(monitor=None, stats=None, title=title)
+
+
+
+@contextmanager
+def tempdir():
+    path = tempfile.mkdtemp()
+    try:
+        yield path
+    finally:
+        try:
+            shutil.rmtree(path)
+        except IOError:
+            sys.stderr.write('Failed to clean up temp dir {}'.format(path))

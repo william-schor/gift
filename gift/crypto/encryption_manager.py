@@ -11,7 +11,7 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives.hmac import HMAC
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 
-from gift.constants import BLOCK_SIZE
+from gift.constants import BLOCK_SIZE, FINAL_SUFFIX
 from gift.secrets.secrets_manager import SecretsManager
 
 """
@@ -53,10 +53,10 @@ class EncryptionManager:
         self.hmac = HMAC(self.signing_key, hashes.SHA256())
 
 
-    def wrap(self, source: BufferedReader, sink: BufferedWriter, gift_name: str):
+    def wrap(self, source: BufferedReader, sink: BufferedWriter, password_length=30):
         password_id = self.secret_manager.create_secret(
-            gift_name,
-            30
+            sink.name.removesuffix(FINAL_SUFFIX),
+            password_length
         )
         # as a precaution, always do a read to retrive the password we just wrote
         password = self.secret_manager.read_secret(password_id)
@@ -69,7 +69,7 @@ class EncryptionManager:
 
         # write password id to file (not secret)
         self._write_data_to_file(
-            self._str_to_bytes(password_id),
+            password_id.encode(),
             sink
         )   
 
@@ -93,19 +93,19 @@ class EncryptionManager:
         # Additionally save the HMAC to the SecretManager
         self.secret_manager.add_signature(
             password_id, 
-            self._bytes_to_str(final_signature)
+            self._bytes_to_b64(final_signature)
         )
 
         # reset HMAC (just in case)
         self._reset_hmac()
 
-    def unwrap(self, source: BufferedReader, sink: BufferedWriter):  
+    def unwrap(self, source: BufferedReader, sink: BufferedWriter) -> str:  
         # start by reading UNVERIFIED data       
         salt = self._read_next_data_block(source)
-        password_id = self._bytes_to_str(self._read_next_data_block(source))
+        password_id = self._read_next_data_block(source).decode()
 
         # make sure the stored hash matches the file's hash
-        stored_signature = self._str_to_bytes(self.secret_manager.read_signature(password_id))
+        stored_signature = self._b64_to_bytes(self.secret_manager.read_signature(password_id))
         file_signature = self._get_hmac_from_file(source)
 
         if stored_signature != file_signature:
@@ -130,6 +130,8 @@ class EncryptionManager:
             encrypted_chunk = self._read_next_data_block(source)
             chunk = self._decrypt(encrypted_chunk)
             sink.write(chunk)
+        
+        return password_id
 
     def _encrypt(self, data: bytes):
         # generate iv
@@ -241,14 +243,14 @@ class EncryptionManager:
             salt=salt,
             iterations=390000,
         )
-        key = kdf.derive(password.encode('utf-8'))
+        key = kdf.derive(password.encode())
         return key, salt
     
     def _reset_hmac(self):
         self.hmac = HMAC(self.signing_key, hashes.SHA256())
     
-    def _str_to_bytes(self, s: str) -> bytes:
+    def _b64_to_bytes(self, s: str) -> bytes:
         return base64.b64decode(s)
         
-    def _bytes_to_str(self, b: bytes) -> str:
+    def _bytes_to_b64(self, b: bytes) -> str:
         return base64.b64encode(b).decode()

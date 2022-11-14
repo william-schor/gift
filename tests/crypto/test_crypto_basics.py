@@ -117,5 +117,5 @@ class TestEncryptionManagerBasics:
              salt=salt1,
              iterations=390000,
         )
-        kdf.verify(password.encode('utf-8'), key1)
+        kdf.verify(password.encode(), key1)
         
