@@ -1,12 +1,18 @@
 # Security Model
 
+This document outlines the security provided by this tool. In short: 
+
+- a leaked password breaks confidentiality and integrity of the corresponding file and no other files
+- read access to the SecretManager breaks confidentiality and integrity of all files for which the password can be read
+- write access to the SecretManager breaks integrity of all files, but not confidentiality
+
 ## Attacker Model
 
 We will assume the attacker has full access to the wrapped files where they are stored.
 The attacker can read these files and can modify these files without your knowledge. 
 
 We will consider the security provided given different assumptions about an attacker's
-level of access to 1password and in the face of different leaks. 
+level of access to the SecretManager and in the face of different leaks. 
 
 ## No Access to SecretManager 
 
@@ -25,8 +31,6 @@ the password was leaked.
     - The attacker modifies file B, changing the password identifier to point to the known password. Then, the attacker arbitrarily modifies the data of the file.
     - The attacker then computes a new HMAC with a new key derived from the salt in the file (or a new one if desired for some reason) and the password and replaces the old HMAC.
     - The verifier will lookup the known password (not able to detect that it is no longer the original password), and verify the new HMAC which will succeed. 
-
-*_The above attack needs to be addressed!_*
 
 #### Fix
 
