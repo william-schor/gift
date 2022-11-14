@@ -9,6 +9,9 @@ The [1Password CLI](https://developer.1password.com) is required (for now).
 The package can be installed in editable mode by cloning this repo and running `pip install -e .`
 To install dev dependencies (mypy, pytest, etc) as well run `pip install -e ".[dev]"`.
 
+Alternatively, you can install the package with `pip install git+https://github.com/william-schor/gift`
+
+
 ## Usage
 
 `gift` has two subcommands: `wrap` and `unwrap`.
