@@ -1,4 +1,5 @@
 from pathlib import Path
+
 import click
 
 from gift.compress.compression_manager import CompressionManager
@@ -6,6 +7,7 @@ from gift.constants import FINAL_SUFFIX, UNWRAPPING_SUFFIX
 from gift.crypto.encryption_manager import EncryptionManager
 from gift.secrets.op_secrets_manager import OnePasswordSecretsManager
 from gift.utils import tempdir
+
 
 @click.group()
 def cli():

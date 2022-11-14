@@ -1,9 +1,7 @@
 from pathlib import Path
 from zipfile import ZIP_DEFLATED, ZipFile
 
-from alive_progress import alive_bar # type: ignore
-from gift.constants import WRAPPING_SUFFIX 
-
+from gift.constants import WRAPPING_SUFFIX
 from gift.utils import InternalException
 
 
