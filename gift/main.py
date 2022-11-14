@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import NoReturn
 
 import click
 
@@ -7,7 +6,7 @@ from gift.compress.compression_manager import CompressionManager
 from gift.constants import FINAL_SUFFIX, UNWRAPPING_SUFFIX
 from gift.crypto.encryption_manager import EncryptionManager
 from gift.secrets.op_secrets_manager import OnePasswordSecretsManager
-from gift.utils import tempdir, spinner
+from gift.utils import spinner, tempdir
 
 
 @click.group()
