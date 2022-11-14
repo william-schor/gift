@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools >= 64.0.0"]
+build-backend = "setuptools.build_meta"
+
+
+[project]
+name = "gift"
+version = "1.0.0"
+authors = [
+  { name="William Schor", email="william@schor.xyz" },
+]
+description = "A command line utility for wrapping and unwrapping files"
+readme = "README.md"
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    'click',
+    'cryptography',
+    'alive_progress'
+]
+
+[project.optional-dependencies]
+dev = [
+    'pytest',
+    'types-setuptools',
+    'mypy'
+]
+
+[project.scripts]
+gift = "gift.main:cli"
+
+
+[project.urls]
+"Homepage" = "https://github.com/william-schor/gift"
+"Bug Tracker" = "https://github.com/william-schor/gift/issues"
