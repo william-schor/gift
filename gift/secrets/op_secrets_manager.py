@@ -34,7 +34,7 @@ class OnePasswordSecretsManager(SecretsManager):
 
         print("Error! Output from 1Password:")
         log_shell_output(stdout, stderr)
-        raise OnePasswordException(e)
+        raise OnePasswordException()
 
 
     def read_secret(self, indentifer: str) -> str:
@@ -86,7 +86,7 @@ class OnePasswordSecretsManager(SecretsManager):
 
         print("Error! Output from 1Password:")
         log_shell_output(stdout, stderr)
-        raise OnePasswordException(e)
+        raise OnePasswordException()
   
     def read_signature(self, indentifier: str) -> str:
         stdout, stderr, exit_code = shell_execute(
