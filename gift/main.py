@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import NoReturn
 
 import click
 
@@ -10,13 +11,13 @@ from gift.utils import tempdir, spinner
 
 
 @click.group()
-def cli():
+def cli() -> None:
     pass
 
 @cli.command()
 @click.argument('filename', type=click.Path(exists=True))
 @click.option('--pwd-length', default=30, help='length of the password')
-def wrap(filename: str, pwd_length):
+def wrap(filename: str, pwd_length: int) -> None:
     # temp dir is auto cleaned up
     with tempdir() as tmp_directory:
         # start by compressing the source
@@ -41,7 +42,7 @@ def wrap(filename: str, pwd_length):
 @cli.command()
 @click.argument('filename', type=click.Path(exists=True, dir_okay=False))
 @click.option('--outdir', '-o', default=".", type=click.Path(exists=True, file_okay=False))
-def unwrap(filename: str, outdir: str):
+def unwrap(filename: str, outdir: str) -> None:
     if not filename.endswith(FINAL_SUFFIX):
         print("This is not a .wrapped file! Cannot proceed.")
         exit(-1)
