@@ -6,7 +6,7 @@ from gift.compress.compression_manager import CompressionManager
 from gift.constants import FINAL_SUFFIX, UNWRAPPING_SUFFIX
 from gift.crypto.encryption_manager import EncryptionManager
 from gift.secrets.op_secrets_manager import OnePasswordSecretsManager
-from gift.utils import tempdir
+from gift.utils import tempdir, spinner
 
 
 @click.group()
@@ -20,17 +20,23 @@ def wrap(filename: str, pwd_length):
     # temp dir is auto cleaned up
     with tempdir() as tmp_directory:
         # start by compressing the source
-        cm = CompressionManager()
-        intermediate_file = cm.wrap(filename, tmp_directory)
+        with spinner(title="Compressing source files..."):
+            cm = CompressionManager()
+            intermediate_file = cm.wrap(filename, tmp_directory)
+        click.echo("🗜️ Compressed! 🗜️")
 
-        # now encrypt
-        opsm = OnePasswordSecretsManager()
-        em = EncryptionManager(opsm)
+        with spinner(title="Encrypting compressed archive..."):
+            # now encrypt
+            opsm = OnePasswordSecretsManager()
+            em = EncryptionManager(opsm)
+        
+            with open(intermediate_file, 'rb') as source, open(f"{filename}{FINAL_SUFFIX}", 'wb') as sink:
+                em.wrap(source, sink, pwd_length)
 
-        with open(intermediate_file, 'rb') as source, open(f"{filename}{FINAL_SUFFIX}", 'wb') as sink:
-            em.wrap(source, sink, pwd_length)
+        click.echo("🔒 Encrypted! 🔒")
 
-    print("Done!")
+    click.echo(f"Created Wrapped File: {filename}{FINAL_SUFFIX}")
+    click.echo("✅ Done! ✅")
 
 @cli.command()
 @click.argument('filename', type=click.Path(exists=True, dir_okay=False))
@@ -46,23 +52,31 @@ def unwrap(filename: str, outdir: str):
         original_filename = filename.removesuffix(FINAL_SUFFIX)
         intermediate_file = tmp_directory / f"{original_filename}{UNWRAPPING_SUFFIX}"
 
-        # decrypt
-        opsm = OnePasswordSecretsManager()
-        em = EncryptionManager(opsm)
-        with (
-            open(filename, 'rb') as source, 
-            open(intermediate_file, 'wb') as sink
-            ):
-            used_password_id = em.unwrap(source, sink)
+        with spinner(title="Decrypting wrapped file..."):
+            # decrypt
+            opsm = OnePasswordSecretsManager()
+            em = EncryptionManager(opsm)
+            with (
+                open(filename, 'rb') as source, 
+                open(intermediate_file, 'wb') as sink
+                ):
+                used_password_id = em.unwrap(source, sink)
+        click.echo("🔓 Decrypted! 🔓")
         
+        with spinner(title="Expanding Archive..."): 
+            unwrap_workspace = Path(outdir) / original_filename
+            unwrap_workspace.mkdir()
 
-        unwrap_workspace = Path(outdir) / original_filename
-        unwrap_workspace.mkdir()
+            # decompress
+            cm = CompressionManager()
+            cm.unwrap(intermediate_file, unwrap_workspace)
 
-        # decompress
-        cm = CompressionManager()
-        cm.unwrap(intermediate_file, unwrap_workspace)
+        click.echo("📈 Expanded! 📈")
 
     # maybe clean up secret manager?
     if click.confirm('Do you want to remove the corresponding secret from your SecretManager?'):
         opsm.delete_secret(used_password_id)
+        click.echo('🧹 Cleaned up secret! 🧹')
+   
+    click.echo(f"Created directory: {unwrap_workspace}") 
+    click.echo("✅ Done! ✅")

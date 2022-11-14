@@ -6,7 +6,7 @@ from contextlib import contextmanager
 from typing import ContextManager
 
 from alive_progress import alive_bar  # type: ignore
-
+from alive_progress.animations.bars import bar_factory # type: ignore
 
 class InternalException(Exception):
     pass
@@ -30,7 +30,8 @@ def log_shell_output(stdout, stderr):
 
 
 def spinner(title: str | None = None) -> ContextManager:
-    return alive_bar(monitor=None, stats=None, title=title)
+    bar = bar_factory('🎁')
+    return alive_bar(bar=bar, monitor=None, stats=None, title=title, receipt=False)
 
 
 
