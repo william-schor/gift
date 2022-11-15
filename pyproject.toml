@@ -31,7 +31,7 @@ dev = [
 ]
 
 [project.scripts]
-gift = "gift.main:cli"
+gift = "gift.cli:cli"
 
 
 [project.urls]

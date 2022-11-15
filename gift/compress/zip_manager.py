@@ -1,11 +1,12 @@
 from pathlib import Path
 from zipfile import ZIP_DEFLATED, ZipFile
+from gift.compress.archive_manager import ArchiveManager
 
 from gift.constants import WRAPPING_SUFFIX
 from gift.utils import InternalException
 
 
-class CompressionManager:
+class ZipManager(ArchiveManager):
     def wrap(self, filepath: str | Path, workspace_path: str | Path) -> Path:
         file = Path(filepath)
         workspace = Path(workspace_path)
@@ -19,7 +20,7 @@ class CompressionManager:
 
         elif file.is_file():
             with ZipFile(new_file, "w", ZIP_DEFLATED) as zip_file:
-                zip_file.write(entry)
+                zip_file.write(file)
         else:
             print(f"We do not know what type of file {filepath} is!")
             raise InternalException()

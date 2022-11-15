@@ -53,7 +53,7 @@ class TestEncryptionManagerBasics:
     def ten_blocks(self) -> list[bytes]:
         return [os.urandom(TEST_BLOCK_SIZE) for _ in range(10)]
 
-    def test_init_key_material(self, encryption_manager: EncryptionManager, password: str):
+    def test_init_key_material(self, encryption_manager: EncryptionManager, password: str) -> None:
         key, salt = encryption_manager._derive_key_from_password(password)
         encryption_manager._init_key_material(password, salt)
         
@@ -62,7 +62,7 @@ class TestEncryptionManagerBasics:
         assert encryption_manager.salt == salt
 
         
-    def test_encrypt_and_decrypt(self, bytes_block: bytes, initialized_encryption_manager: EncryptionManager):
+    def test_encrypt_and_decrypt(self, bytes_block: bytes, initialized_encryption_manager: EncryptionManager) -> None:
         # we are not testing security features. Only basic IO and 
         # ensuring that each function is the inverse of the other.
         
@@ -71,7 +71,7 @@ class TestEncryptionManagerBasics:
 
         assert plaintext != cipher and plaintext == bytes_block
     
-    def test_verify_signature(self, ten_blocks: list[bytes], initialized_encryption_manager: EncryptionManager):
+    def test_verify_signature(self, ten_blocks: list[bytes], initialized_encryption_manager: EncryptionManager) -> None:
         # open a temp file to do this
         with tempfile.NamedTemporaryFile() as buffer:
             # write all blocks to the file
@@ -89,11 +89,11 @@ class TestEncryptionManagerBasics:
             initialized_encryption_manager._verify_signature(buffer, signature) # type: ignore
 
 
-    def test_get_hmac_from_file(self, encryption_manager: EncryptionManager, filled_buffer: BytesIO, bytes_block: bytes):
+    def test_get_hmac_from_file(self, encryption_manager: EncryptionManager, filled_buffer: BytesIO, bytes_block: bytes) -> None:
         # just make sure it gets last 32 bytes
         assert encryption_manager._get_hmac_from_file(filled_buffer) == bytes_block[-32:] # type: ignore
 
-    def test_read_and_write_data_to_file(self, bytes_block: bytes, initialized_encryption_manager: EncryptionManager):
+    def test_read_and_write_data_to_file(self, bytes_block: bytes, initialized_encryption_manager: EncryptionManager) -> None:
         # test that _write_data_to_file and _read_next_data_block work together
         in_memory_file = BytesIO()
         initialized_encryption_manager._write_data_to_file(bytes_block, in_memory_file) # type: ignore
@@ -104,7 +104,7 @@ class TestEncryptionManagerBasics:
 
         assert bytes_block == read_bytes
 
-    def test_derive_key_from_password(self, encryption_manager: EncryptionManager, password: str):
+    def test_derive_key_from_password(self, encryption_manager: EncryptionManager, password: str) -> None:
         key1, salt1 = encryption_manager._derive_key_from_password(password)
         key2, salt2 = encryption_manager._derive_key_from_password(password, salt1)
 

@@ -44,7 +44,7 @@ class EncryptionManager:
         else:
             self.block_size = BLOCK_SIZE
         
-    def _init_key_material(self, password: str, salt_candidate: bytes | None = None):
+    def _init_key_material(self, password: str, salt_candidate: bytes | None = None) -> None:
         key, salt = self._derive_key_from_password(password, salt_candidate)
 
         self.encryption_key = key[:16]
@@ -53,7 +53,7 @@ class EncryptionManager:
         self.hmac = HMAC(self.signing_key, hashes.SHA256())
 
 
-    def wrap(self, source: BufferedReader, sink: BufferedWriter, password_length=30):
+    def wrap(self, source: BufferedReader, sink: BufferedWriter, password_length: int =30) -> None:
         password_id = self.secret_manager.create_secret(
             sink.name.removesuffix(FINAL_SUFFIX),
             password_length
@@ -133,7 +133,7 @@ class EncryptionManager:
         
         return password_id
 
-    def _encrypt(self, data: bytes):
+    def _encrypt(self, data: bytes) -> bytes:
         # generate iv
         iv = os.urandom(16)
 
@@ -151,7 +151,7 @@ class EncryptionManager:
 
         return iv + ciphertext
 
-    def _decrypt(self, token: bytes):
+    def _decrypt(self, token: bytes) -> bytes:
         # find iv
         iv = token[:16]
         ciphertext = token[16:]
@@ -233,7 +233,7 @@ class EncryptionManager:
         
         return source.read(size)
     
-    def _derive_key_from_password(self, password: str, salt: bytes | None = None):
+    def _derive_key_from_password(self, password: str, salt: bytes | None = None) -> tuple[bytes, bytes]:
         if salt is None:
             salt = os.urandom(16)
 
@@ -246,7 +246,7 @@ class EncryptionManager:
         key = kdf.derive(password.encode())
         return key, salt
     
-    def _reset_hmac(self):
+    def _reset_hmac(self) -> None:
         self.hmac = HMAC(self.signing_key, hashes.SHA256())
     
     def _b64_to_bytes(self, s: str) -> bytes:
