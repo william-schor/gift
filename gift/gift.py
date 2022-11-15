@@ -7,8 +7,7 @@ import click
 from gift.constants import FINAL_SUFFIX, UNWRAPPING_SUFFIX
 from gift.compress.archive_manager import ArchiveManager
 from gift.crypto.encryption_manager import EncryptionManager
-from gift.secrets.secrets_manager import SecretsManager
-from gift.utils import spinner, tempdir
+from gift.utils import spinner, tempdir, warn
 
 
 class Gift:
@@ -67,11 +66,17 @@ class Gift:
                 self.am.unwrap(intermediate_file, unwrap_workspace)
 
             click.echo("📈 Expanded!  📈")
-
-        # maybe clean up secret manager?
-        if click.confirm('Do you want to remove the corresponding secret from your SecretManager?'):
-            self.em.secret_manager.delete_secret(used_password_id)
-            click.echo('🧹 Cleaned up secret! 🧹')
-    
+        
+        if used_password_id:
+            # maybe clean up secret manager?
+            if click.confirm('Do you want to remove the corresponding secret from your SecretManager?'):
+                self.em.secret_manager.delete_secret(used_password_id)
+                click.echo('🧹 Cleaned up secret! 🧹')
+        
+        else:
+            warn("⚠️  Warning! Unwrapping did not manage to record secret identifier...\n"
+            "This could be a bug or you could be using a secret manager or"
+            " encryption manager which does not support this behavior ⚠️")
+        
         click.echo(f"Created directory: {unwrap_workspace}") 
         click.echo("✅ Done! ✅")

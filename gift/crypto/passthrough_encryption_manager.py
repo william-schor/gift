@@ -1,16 +1,18 @@
 from abc import ABC, abstractmethod
 from io import BufferedReader, BufferedWriter
+import shutil
 
 from gift.secrets.secrets_manager import SecretsManager
 
+from gift.crypto.encryption_manager import EncryptionManager
 
-class EncryptionManager(ABC):
-    def __init__(self, secret_manager: SecretsManager) -> None:
-        self.secret_manager = secret_manager
 
-    @abstractmethod
+class PassthroughEncryptionManager(EncryptionManager):
+    secret_manager: SecretsManager
+
     def wrap(self, source: BufferedReader, sink: BufferedWriter, password_length: int = 30) -> None:
-       pass
-    @abstractmethod
+       shutil.copyfileobj(source, sink)
+       return None
     def unwrap(self, source: BufferedReader, sink: BufferedWriter) -> str | None:  
-      pass
+        shutil.copyfileobj(source, sink)
+        return None
