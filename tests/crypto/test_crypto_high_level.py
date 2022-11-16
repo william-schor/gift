@@ -3,7 +3,7 @@ import tempfile
 
 import pytest
 
-from gift.crypto.encryption_manager import EncryptionManager
+from gift.crypto.aes_cbc_encryption_manager import AesCbcEncryptionManager
 from gift.secrets.dict_secrets_manager import DictSecretsManager
 
 TEST_BLOCK_SIZE = 512
@@ -24,9 +24,9 @@ class TestEncryptionManagerHighLevel:
         ],
         ids=("empty file", "one block", "10 blocks", "100 blocks"),
     )
-    def test_full_flow(self, initial_data: bytes):
+    def test_full_flow(self, initial_data: bytes) -> None:
         sm = DictSecretsManager()
-        em = EncryptionManager(sm, TEST_BLOCK_SIZE) # type: ignore
+        em = AesCbcEncryptionManager(sm, TEST_BLOCK_SIZE) # type: ignore
 
         with (
             tempfile.NamedTemporaryFile(buffering=0) as source, 
