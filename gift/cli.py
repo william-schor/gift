@@ -7,8 +7,8 @@ from gift.compress.zip_manager import ZipManager
 from gift.compress.passthrough_archive_manager import PassthroughArchiveManager
 ###############
 ##  crypto  ##
-from gift.crypto.aes_cbc_encryption_manager import AesCbcEncryptionManager
-from gift.crypto.passthrough_encryption_manager import PassthroughEncryptionManager
+from gift.crypto.engines.aes_cbc_encryption_manager import AesCbcEncryptionManager
+from gift.crypto.engines.passthrough_encryption_manager import PassthroughEncryptionManager
 ###############
 ## secrets  ##
 from gift.secrets.op_secrets_manager import OnePasswordSecretsManager

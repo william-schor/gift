@@ -4,7 +4,7 @@ import shutil
 
 from gift.secrets.secrets_manager import SecretsManager
 
-from gift.crypto.encryption_manager import EncryptionManager
+from gift.crypto.engines.encryption_manager import EncryptionManager
 
 
 class PassthroughEncryptionManager(EncryptionManager):

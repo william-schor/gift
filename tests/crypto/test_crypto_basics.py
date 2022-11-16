@@ -6,7 +6,7 @@ import pytest
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 
-from gift.crypto.aes_cbc_encryption_manager import AesCbcEncryptionManager
+from gift.crypto.engines.aes_cbc_encryption_manager import AesCbcEncryptionManager
 from gift.secrets.dict_secrets_manager import DictSecretsManager
 from gift.secrets.secrets_manager import SecretsManager
 

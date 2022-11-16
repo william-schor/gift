@@ -3,7 +3,7 @@ import tempfile
 
 import pytest
 
-from gift.crypto.aes_cbc_encryption_manager import AesCbcEncryptionManager
+from gift.crypto.engines.aes_cbc_encryption_manager import AesCbcEncryptionManager
 from gift.secrets.dict_secrets_manager import DictSecretsManager
 
 TEST_BLOCK_SIZE = 512

@@ -12,7 +12,7 @@ from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 
 from gift.constants import BLOCK_SIZE, FINAL_SUFFIX
 from gift.secrets.secrets_manager import SecretsManager
-from gift.crypto.encryption_manager import EncryptionManager
+from gift.crypto.engines.encryption_manager import EncryptionManager
 
 """
 File format:

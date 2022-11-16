@@ -6,7 +6,7 @@ import click
 
 from gift.constants import FINAL_SUFFIX, UNWRAPPING_SUFFIX
 from gift.compress.archive_manager import ArchiveManager
-from gift.crypto.encryption_manager import EncryptionManager
+from gift.crypto.engines.encryption_manager import EncryptionManager
 from gift.utils import spinner, tempdir, warn
 
 
