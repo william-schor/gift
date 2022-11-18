@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 class SecretsManager(ABC):
 
     @abstractmethod
-    def create_secret(self, indentifer: str, pwd_length: int) -> str:
+    def create_secret(self, indentifer: str, secret_length: int) -> str:
         pass
     @abstractmethod
     def read_secret(self, indentifer: str) -> str:

@@ -3,12 +3,11 @@ import click
 ###############
 # compressors #
 from gift.compress.tar_manager import TarManager
-from gift.compress.zip_manager import ZipManager
-from gift.compress.passthrough_archive_manager import PassthroughArchiveManager
 ###############
 ##  crypto  ##
-from gift.crypto.engines.aes_cbc_encryption_manager import AesCbcEncryptionManager
-from gift.crypto.engines.passthrough_encryption_manager import PassthroughEncryptionManager
+from gift.crypto.engines.encryption_engine_builder import EncryptionEngineBuilder
+from gift.crypto.formatters.encrypted_file_format import EncyptedFileFormatV1
+
 ###############
 ## secrets  ##
 from gift.secrets.op_secrets_manager import OnePasswordSecretsManager
@@ -25,13 +24,14 @@ def cli() -> None:
 
 @cli.command()
 @click.argument('filename', type=click.Path(exists=True))
-@click.option('--pwd-length', default=30, help='length of the password')
-def wrap(filename: str, pwd_length: int) -> None:
+@click.option('--secret-length', default=30, help='length of the secret (i.e. password)')
+def wrap(filename: str, secret_length: int) -> None:
     am = TarManager()
     sm = PassthroughSecretsManager()
-    em = PassthroughEncryptionManager(sm)
-    gift = Gift(am, em)
-    gift.wrap(filename=filename, pwd_length=pwd_length)
+    eb = EncryptionEngineBuilder(sm, secret_length)
+    ef = EncyptedFileFormatV1(eb)
+    gift = Gift(am, ef)
+    gift.wrap(filename=filename)
 
 @cli.command()
 @click.argument('filename', type=click.Path(exists=True, dir_okay=False))
@@ -39,6 +39,7 @@ def wrap(filename: str, pwd_length: int) -> None:
 def unwrap(filename: str, outdir: str) -> None:
     am = TarManager()
     sm = PassthroughSecretsManager()
-    em = PassthroughEncryptionManager(sm)
-    gift = Gift(am, em)
+    eb = EncryptionEngineBuilder(sm)
+    ef = EncyptedFileFormatV1(eb)
+    gift = Gift(am, ef)
     gift.unwrap(filename=filename, outdir=outdir)

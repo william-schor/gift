@@ -62,3 +62,4 @@ class colors:
 
 def warn(warning: str) -> None:
     click.echo(f"{colors.WARNING}{warning}{colors.ENDC}")
+
