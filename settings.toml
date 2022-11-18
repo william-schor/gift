@@ -1,0 +1,18 @@
+[building-blocks]
+secret-manager="1password"
+# tar or zip (both use compression)
+archive-manager="tar"
+# Note: for security reasons, these are not tracked in the wrapped file itself.
+# So (for now) it is your job to make sure you are unwrapping with the correct
+# settings. (probably these should be stored in secret-manager...)
+file-format="v1"
+encryption-engine="aes-cbc"
+
+[1password]
+command = "op"
+# Make sure this vault exists!
+vault = "FileWrap"
+
+[v1]
+# .5 mb; Controls how large each chunk is when encrypting a file in chunks
+block-size=512000
