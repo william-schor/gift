@@ -17,10 +17,11 @@ from gift.secrets.passthrough_secrets_manager import PassthroughSecretsManager
 from gift.gift import Gift
 ###############
 
-
+@click.version_option()
 @click.group()
 def cli() -> None:
     pass
+
 
 @cli.command()
 @click.argument('filename', type=click.Path(exists=True))
