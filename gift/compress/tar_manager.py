@@ -1,11 +1,12 @@
-from pathlib import Path
 import tarfile
+from pathlib import Path
 
+from gift.compress.archive_manager import ArchiveManager
 from gift.constants import WRAPPING_SUFFIX
 from gift.utils import InternalException
 
 
-class TarManager:
+class TarManager(ArchiveManager):
     def wrap(self, filepath: str | Path, workspace_path: str | Path) -> Path:
         workspace = Path(workspace_path)
         new_file = workspace / f"{filepath}{WRAPPING_SUFFIX}"
@@ -22,5 +23,5 @@ class TarManager:
             print(f"{dest_path} is not a directory! Please give a directory to unwrap into.")
             raise InternalException()
 
-        with tarfile.open(archive_path, 'w:gz') as archive:
+        with tarfile.open(archive_path, 'r:gz') as archive:
             archive.extractall(dest)
