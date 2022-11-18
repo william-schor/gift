@@ -39,3 +39,6 @@ Options:
 ## Secret Manager
 
 One cool feature of `gift` is that it can use different secret managers to hold secret material. [1Password](https://1password.com) is the secret manager that inspired the project and is currently the only one implemented.
+
+You should set up a vault in 1password for the tool to use! This keeps `gift`'s entries separate from yours. The default vault name is `FileWrap`. You can control
+this via `settings.toml`. The best way to do that is to take the default `settings.toml` and install it in your home directory under `~/.gift/settings.toml`.

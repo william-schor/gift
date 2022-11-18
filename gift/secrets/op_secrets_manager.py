@@ -9,9 +9,10 @@ def success(code: int) -> bool:
     return code == 0
 
 class OnePasswordSecretsManager(SecretsManager):
-    VAULT = "FileWrap" # this can eventually be a setting
-    OP_COMMAND = "op" # this can be a setting later
-
+    def __init__(self, vault: str, command: str) -> None:
+        self.VAULT = vault
+        self.OP_COMMAND = command
+        
     def create_secret(self, indentifer: str, pwd_length: int) -> str:
         stdout, stderr, exit_code = shell_execute(
             self.OP_COMMAND,

@@ -7,8 +7,7 @@ import struct
 from io import BufferedReader, BufferedWriter
 from pathlib import Path
 
-from gift.constants import BLOCK_SIZE
-from gift.crypto.engines.encryption_engine_builder import EncryptionEngineBuilder
+from gift.crypto.encryption_engine_builder import EncryptionEngineBuilder
 
 """
 File Format:
@@ -28,6 +27,9 @@ File Format:
 ----------------------------
     HMAC      (N bytes)     |
 ----------------------------
+
+Note that all sections (except the HMAC for security reasons) are prefixed
+with their own length (4 bytes) to allow easy deserialization.
 """
 
 class IntegrityViolation(Exception):
@@ -37,10 +39,10 @@ class EncyptedFileFormatV1:
     def __init__(
         self, 
         encryption_engine_builder: EncryptionEngineBuilder,
-        block_size: int | None = None
+        block_size: int
     ) -> None:
         self.encryption_engine_builder = encryption_engine_builder
-        self.block_size = block_size if block_size else BLOCK_SIZE
+        self.block_size = block_size
         
 
     def wrap(self, source: BufferedReader, sink: BufferedWriter) -> str | None:

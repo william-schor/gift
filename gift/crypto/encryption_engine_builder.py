@@ -1,9 +1,10 @@
+from typing import Type
 from gift.crypto.engines.aes_cbc_encryption_engine import AesCbcEncryptionEngine
 from gift.secrets.secrets_manager import SecretsManager
 from gift.crypto.engines.encryption_engine import EncryptionEngine
 
 class EncryptionEngineBuilder:
-    def __init__(self, secret_manager: SecretsManager, secret_length: int = 30) -> None:
+    def __init__(self, secret_manager: SecretsManager, ee_class: Type[EncryptionEngine], secret_length: int = 30, ) -> None:
         self.secret_manager = secret_manager
         self.secret_length = secret_length
 

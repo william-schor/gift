@@ -1,6 +1,9 @@
 from abc import ABC, abstractmethod
 
 class SecretsManager(ABC):
+    @abstractmethod
+    def __init__(self, scope: str, cli_command: str) -> None:
+        pass
 
     @abstractmethod
     def create_secret(self, indentifer: str, secret_length: int) -> str:

@@ -10,7 +10,7 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 
 from gift.crypto.engines.aes_cbc_encryption_engine import AesCbcEncryptionEngine
-from gift.crypto.engines.encryption_engine_builder import EncryptionEngineBuilder
+from gift.crypto.encryption_engine_builder import EncryptionEngineBuilder
 from gift.secrets.dict_secrets_manager import DictSecretsManager
 from gift.secrets.secrets_manager import SecretsManager
 

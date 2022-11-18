@@ -20,7 +20,7 @@ class DictSecretsManager:
         }
         return indentifer
 
-    def read_secret(self, indentifer: str):
+    def read_secret(self, indentifer: str) -> str:
         return self.secret_store[indentifer]["password"]
 
     def delete_secret(self, identifier: str) -> None:
