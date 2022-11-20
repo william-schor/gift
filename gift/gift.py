@@ -30,7 +30,7 @@ class Gift:
 
             with spinner(title="Encrypting compressed archive..."):
                 with open(intermediate_file, 'rb') as source, open(f"{filename}{FINAL_SUFFIX}", 'wb') as sink:
-                    self.encrypted_file_formatter.wrap(source, sink)
+                    self.encrypted_file_formatter.wrap(filename, source, sink)
 
             click.echo("🔒 Encrypted! 🔒")
 

@@ -45,9 +45,9 @@ class EncyptedFileFormatV1:
         self.block_size = block_size
         
 
-    def wrap(self, source: BufferedReader, sink: BufferedWriter) -> str | None:
+    def wrap(self, filename: str, source: BufferedReader, sink: BufferedWriter) -> str | None:
         # build an encryption engine
-        self.encryption_engine = self.encryption_engine_builder.build_wrapper(secret_name=source.name)
+        self.encryption_engine = self.encryption_engine_builder.build_wrapper(secret_name=filename)
 
         # first, get all key components
         key_components_to_save = self.encryption_engine.get_public_key_components()
